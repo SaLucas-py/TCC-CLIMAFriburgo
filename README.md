@@ -172,8 +172,8 @@ O sistema combina duas abordagens:
 ### Instalação Rápida
 ```bash
 # 1. Clone o repositório
-git clone https://github.com/seu-usuario/hydro-alert-system.git
-cd hydro-alert-system
+git clone https://github.com/seu-usuario/TCC-CLIMAFriburgo.git
+cd TCC-CLIMAFriburgo
 
 # 2. Instale dependências
 pip install -r requirements.txt
