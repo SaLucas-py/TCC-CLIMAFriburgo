@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clima Friburgo</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js"></script>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <div class="loading-logo">
+                <i class="fas fa-water"></i>
+            </div>
+            <div class="loading-text">
+                <h2>Clima Friburgo</h2>
+                <p>Carregando dados...</p>
+            </div>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-water"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>Clima Friburgo</h1>
+                        <span>Nova Friburgo</span>
+                    </div>
+                </div>
+                
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-satellite-dish"></i>
+                        <div>
+                            <span class="stat-label">Status</span>
+                            <span class="stat-value" id="connectionStatus">Online</span>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-clock"></i>
+                        <div>
+                            <span class="stat-label">Última Atualização</span>
+                            <span class="stat-value" id="lastUpdate">--:--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            
+            <!-- Alert Banner -->
+            <div class="alert-banner-container">
+                <div class="alert-banner" id="alertBanner">
+                    <div class="alert-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="alert-content">
+                        <h3 id="alertTitle">Alerta Ativo</h3>
+                        <p id="alertDescription">Descrição do alerta</p>
+                    </div>
+                    <button class="alert-close" onclick="closeAlert()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Hero Section -->
+            <section class="hero-section">
+                <div class="hero-content">
+                    <div class="hero-main">
+                        <div class="current-weather">
+                            <div class="weather-icon">
+                                <i class="fas fa-cloud-sun" id="weatherIcon"></i>
+                            </div>
+                            <div class="weather-info">
+                                <div class="temperature-main">
+                                    <span id="currentTemp">--</span>
+                                    <span class="temp-unit">°C</span>
+                                </div>
+                                <div class="weather-description">
+                                    <span id="weatherDescription">Carregando...</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert-indicator">
+                            <div class="alert-level" id="alertLevel">
+                                <div class="alert-level-icon">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <div class="alert-level-content">
+                                    <span class="alert-level-text" id="alertLevelText">Mockado: Muito baixo</span>
+                                    <span class="alert-level-desc" id="alertLevelDesc">Situação Normal</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="hero-stats">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-tint"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="humidityValue">--</span>
+                                <span class="stat-label">Umidade</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-cloud-rain"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="precipValue">--</span>
+                                <span class="stat-label">Precipitação</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-wind"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="windValue">--</span>
+                                <span class="stat-label">Vento</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Detailed Cards -->
+            <section class="cards-section">
+                <div class="cards-grid">
+                    
+                    <!-- Temperature Card -->
+                    <div class="info-card temperature-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-thermometer-half"></i> Temperatura</h3>
+                            <div class="card-trend up">
+                                <i class="fas fa-arrow-up"></i>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="main-metric">
+                                <span class="metric-value" id="tempCurrent">--</span>
+                                <span class="metric-unit">°C</span>
+                            </div>
+                            <div class="metric-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">Sensação</span>
+                                    <span class="detail-value" id="tempFeels">--°C</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Mínima</span>
+                                    <span class="detail-value" id="tempMin">--°C</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Máxima</span>
+                                    <span class="detail-value" id="tempMax">--°C</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Humidity Card -->
+                    <div class="info-card humidity-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-tint"></i> Umidade</h3>
+                            <div class="card-trend stable">
+                                <i class="fas fa-minus"></i>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="main-metric">
+                                <span class="metric-value" id="humidCurrent">--</span>
+                                <span class="metric-unit">%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="humidityProgress"></div>
+                            </div>
+                            <div class="metric-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">Mínima</span>
+                                    <span class="detail-value" id="humidMin">--°C</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Ideal</span>
+                                    <span class="detail-value">40-60%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Precipitation Card -->
+                    <div class="info-card precipitation-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-cloud-rain"></i> Precipitação</h3>
+                            <div class="card-trend down">
+                                <i class="fas fa-arrow-down"></i>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="main-metric">
+                                <span class="metric-value" id="precipCurrent">--</span>
+                                <span class="metric-unit">mm</span>
+                            </div>
+                            <div class="metric-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">1h</span>
+                                    <span class="detail-value" id="precip1h">--mm</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">4h</span>
+                                    <span class="detail-value" id="precip4h">--mm</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">24h</span>
+                                    <span class="detail-value" id="precip24h">--mm</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Wind Card -->
+                    <div class="info-card wind-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-wind"></i> Vento</h3>
+                            <div class="card-trend up">
+                                <i class="fas fa-arrow-up"></i>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="main-metric">
+                                <span class="metric-value" id="windCurrent">--</span>
+                                <span class="metric-unit">m/s</span>
+                            </div>
+                            <div class="wind-indicator">
+                                <div class="wind-arrow" id="windDirection">
+                                    <i class="fas fa-arrow-up"></i>
+                                </div>
+                            </div>
+                            <div class="metric-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">Máximo</span>
+                                    <span class="detail-value" id="windMax">--m/s</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Índice UV</span>
+                                    <span class="detail-value" id="uvIndex">--</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="charts-section">
+                <div class="charts-grid">
+                    
+                    <!-- Precipitation Chart -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3><i class="fas fa-chart-area"></i> Precipitação (24h)</h3>
+                            <div class="chart-controls">
+                                <button class="chart-btn active" data-period="24h">24h</button>
+                                <button class="chart-btn" data-period="7d">7d</button>
+                                <button class="chart-btn" data-period="30d">30d</button>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="precipitationChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Temperature Chart -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3><i class="fas fa-chart-line"></i> Temperatura & Umidade</h3>
+                            <div class="chart-legend">
+                                <span class="legend-item">
+                                    <span class="legend-color temp"></span>
+                                    Temperatura
+                                </span>
+                                <span class="legend-item">
+                                    <span class="legend-color humidity"></span>
+                                    Umidade
+                                </span>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="temperatureChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Alert History -->
+            <section class="history-section">
+                <div class="history-header">
+                    <h3><i class="fas fa-history"></i> Histórico de Alertas</h3>
+                    <div class="history-controls">
+                        <button class="btn-secondary" onclick="exportData()">
+                            <i class="fas fa-download"></i>
+                            Exportar
+                        </button>
+                        <button class="btn-secondary" onclick="refreshData()">
+                            <i class="fas fa-sync-alt"></i>
+                            Atualizar
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="history-table">
+                    <table id="alertsTable">
+                        <thead>
+                            <tr>
+                                <th>Data/Hora</th>
+                                <th>Nível</th>
+                                <th>Precipitação</th>
+                                <th>Umidade</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="alertsTableBody">
+                            <tr>
+                                <td colspan="5" class="loading-row">
+                                    <div class="table-loading">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                        Carregando dados...
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <h4>Clima Friburgo</h4>
+                    <p>Sistema de Monitoramento Hidrológico</p>
+                    <p>Dados: INMET • CPTEC/INPE</p>
+                </div>
+                <div class="footer-links">
+                    <a href="#" onclick="showInfo()">Sobre</a>
+                    <a href="#" onclick="showHelp()">Ajuda</a>
+                    <a href="#" onclick="showContacts()">Contatos</a>
+                </div>
+                <div class="footer-emergency">
+                    <h5>Emergências</h5>
+                    <p>Defesa Civil: <strong>199</strong></p>
+                    <p>Bombeiros: <strong>193</strong></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Notification Container -->
+    <div class="notifications" id="notifications"></div>
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

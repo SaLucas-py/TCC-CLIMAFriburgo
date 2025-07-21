@@ -1,0 +1,63 @@
+# Arquivos de Configuração Sensível
+.env
+.env.local
+.env.production
+.env.development
+config/database.py
+config/secrets.py
+
+# Logs
+logs/
+*.log
+captura_dados.log
+alertas.log
+divergencias_alerta.log
+
+# Modelos ML Treinados
+data/models/*.pkl
+modelo_alerta.pkl
+
+# Cache Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Ambientes Virtuais
+venv/
+env/
+ENV/
+.venv
+
+# Screenshots de Erro
+erro_*.png
+
+# Arquivos do Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporários
+*.tmp
+*.temp
+temp/
+
+# Dados de Teste
+test_data/
+*.sql
+backup_*.sql
+
+# ChromeDriver
+chromedriver.exe
+chromedriver
+
+# Jupyter Notebooks (se usar)
+.ipynb_checkpoints/
